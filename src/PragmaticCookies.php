@@ -85,7 +85,7 @@ class PragmaticCookies extends Plugin
 
     
 
-    public function getCpNavItem(): array
+    public function getCpNavItem(): ?array
     {
         return null;
     }
