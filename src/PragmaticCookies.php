@@ -40,6 +40,12 @@ class PragmaticCookies extends Plugin
         parent::init();
         self::$plugin = $this;
 
+        Craft::$app->i18n->translations['pragmatic-cookies'] = [
+            'class' => \yii\i18n\PhpMessageSource::class,
+            'basePath' => __DIR__ . '/translations',
+            'forceTranslation' => true,
+        ];
+
         $this->setComponents([
             'categories' => CategoriesService::class,
             'cookies' => CookiesService::class,
@@ -101,9 +107,10 @@ class PragmaticCookies extends Plugin
             Cp::class,
             Cp::EVENT_REGISTER_CP_NAV_ITEMS,
             function(RegisterCpNavItemsEvent $event) {
+                $toolsLabel = Craft::t('pragmatic-cookies', 'Tools');
                 $groupKey = null;
                 foreach ($event->navItems as $key => $item) {
-                    if (($item['label'] ?? '') === 'Pragmatic' && isset($item['subnav'])) {
+                    if (($item['label'] ?? '') === $toolsLabel && isset($item['subnav'])) {
                         $groupKey = $key;
                         break;
                     }
@@ -111,8 +118,8 @@ class PragmaticCookies extends Plugin
 
                 if ($groupKey === null) {
                     $newItem = [
-                        'label' => 'Pragmatic',
-                        'url' => 'pragmatic-cookies/general',
+                        'label' => $toolsLabel,
+                        'url' => 'pragmatic-cookies',
                         'icon' => __DIR__ . '/icons/icon.svg',
                         'subnav' => [],
                     ];
