@@ -3,6 +3,7 @@
 namespace pragmatic\cookies\controllers;
 
 use Craft;
+use craft\helpers\Cp;
 use craft\web\Controller;
 use pragmatic\cookies\models\CookieCategoryModel;
 use pragmatic\cookies\models\CookieModel;
@@ -24,10 +25,14 @@ class DefaultController extends Controller
 
     public function actionGeneral(): Response
     {
-        $settings = PragmaticCookies::$plugin->getSettings();
+        $selectedSite = Cp::requestedSite() ?? Craft::$app->getSites()->getPrimarySite();
+        $selectedSiteId = (int)$selectedSite->id;
+        $settings = PragmaticCookies::$plugin->siteSettings->getSiteSettings($selectedSiteId);
 
         return $this->renderTemplate('pragmatic-cookies/general', [
             'settings' => $settings,
+            'selectedSite' => $selectedSite,
+            'selectedSiteId' => $selectedSiteId,
         ]);
     }
 
@@ -35,17 +40,20 @@ class DefaultController extends Controller
     {
         $this->requirePostRequest();
 
-        $plugin = PragmaticCookies::$plugin;
-        $settings = $plugin->getSettings();
+        $request = Craft::$app->getRequest();
+        $siteId = (int)$request->getBodyParam('site', 0);
+        if (!$siteId) {
+            $siteId = (int)(Cp::requestedSite()?->id ?? Craft::$app->getSites()->getPrimarySite()->id);
+        }
 
-        $settings->popupTitle = Craft::$app->getRequest()->getBodyParam('popupTitle', $settings->popupTitle);
-        $settings->popupDescription = Craft::$app->getRequest()->getBodyParam('popupDescription', $settings->popupDescription);
-        $settings->acceptAllLabel = Craft::$app->getRequest()->getBodyParam('acceptAllLabel', $settings->acceptAllLabel);
-        $settings->rejectAllLabel = Craft::$app->getRequest()->getBodyParam('rejectAllLabel', $settings->rejectAllLabel);
-        $settings->savePreferencesLabel = Craft::$app->getRequest()->getBodyParam('savePreferencesLabel', $settings->savePreferencesLabel);
-        $settings->cookiePolicyUrl = Craft::$app->getRequest()->getBodyParam('cookiePolicyUrl', $settings->cookiePolicyUrl);
-
-        if (!Craft::$app->getPlugins()->savePluginSettings($plugin, $settings->toArray())) {
+        if (!PragmaticCookies::$plugin->siteSettings->saveSiteSettings($siteId, [
+            'popupTitle' => $request->getBodyParam('popupTitle'),
+            'popupDescription' => $request->getBodyParam('popupDescription'),
+            'acceptAllLabel' => $request->getBodyParam('acceptAllLabel'),
+            'rejectAllLabel' => $request->getBodyParam('rejectAllLabel'),
+            'savePreferencesLabel' => $request->getBodyParam('savePreferencesLabel'),
+            'cookiePolicyUrl' => $request->getBodyParam('cookiePolicyUrl'),
+        ])) {
             Craft::$app->getSession()->setError('Could not save settings.');
             return null;
         }

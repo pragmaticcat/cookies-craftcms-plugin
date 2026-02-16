@@ -34,7 +34,7 @@ class ConsentService extends Component
 
     public function renderPopup(): string
     {
-        $settings = PragmaticCookies::$plugin->getSettings();
+        $settings = $this->getResolvedSettingsForCurrentSite();
         $categories = PragmaticCookies::$plugin->categories->getAllCategories();
         $consent = $this->getCurrentConsent();
 
@@ -141,5 +141,21 @@ class ConsentService extends Component
     private function _hasOpenPreferencesTrigger(string $output): bool
     {
         return str_contains($output, 'data-pragmatic-open-preferences');
+    }
+
+    private function getResolvedSettingsForCurrentSite(): object
+    {
+        $settings = clone PragmaticCookies::$plugin->getSettings();
+        $siteId = (int)Craft::$app->getSites()->getCurrentSite()->id;
+        $siteSettings = PragmaticCookies::$plugin->siteSettings->getSiteSettings($siteId);
+
+        $settings->popupTitle = $siteSettings->popupTitle;
+        $settings->popupDescription = $siteSettings->popupDescription;
+        $settings->acceptAllLabel = $siteSettings->acceptAllLabel;
+        $settings->rejectAllLabel = $siteSettings->rejectAllLabel;
+        $settings->savePreferencesLabel = $siteSettings->savePreferencesLabel;
+        $settings->cookiePolicyUrl = $siteSettings->cookiePolicyUrl;
+
+        return $settings;
     }
 }

@@ -16,6 +16,7 @@
     {{ csrfInput() }}
     {{ actionInput('pragmatic-cookies/default/save-general') }}
     {{ redirectInput('pragmatic-cookies/general', _siteParam) }}
+    {{ hiddenInput('site', selectedSiteId ?? craft.app.sites.currentSite.id) }}
 
     {{ forms.textField({
       label: 'Popup Title'|t('pragmatic-cookies'),

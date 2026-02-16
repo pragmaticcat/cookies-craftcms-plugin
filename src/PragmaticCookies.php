@@ -17,6 +17,7 @@ use pragmatic\cookies\services\CategoriesService;
 use pragmatic\cookies\services\ConsentService;
 use pragmatic\cookies\services\CookiesService;
 use pragmatic\cookies\services\ScannerService;
+use pragmatic\cookies\services\SiteSettingsService;
 use pragmatic\cookies\twig\PragmaticCookiesTwigExtension;
 use pragmatic\cookies\variables\PragmaticCookiesVariable;
 use yii\base\Event;
@@ -26,6 +27,7 @@ use yii\base\Event;
  * @property CookiesService $cookies
  * @property ScannerService $scanner
  * @property ConsentService $consent
+ * @property SiteSettingsService $siteSettings
  */
 class PragmaticCookies extends Plugin
 {
@@ -51,6 +53,7 @@ class PragmaticCookies extends Plugin
             'cookies' => CookiesService::class,
             'scanner' => ScannerService::class,
             'consent' => ConsentService::class,
+            'siteSettings' => SiteSettingsService::class,
         ]);
 
         $this->_registerCpRoutes();

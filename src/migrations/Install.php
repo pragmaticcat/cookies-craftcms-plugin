@@ -21,6 +21,7 @@ class Install extends Migration
         $this->dropTableIfExists('{{%pragmatic_cookies_scan_results}}');
         $this->dropTableIfExists('{{%pragmatic_cookies_scans}}');
         $this->dropTableIfExists('{{%pragmatic_cookies_consent_logs}}');
+        $this->dropTableIfExists('{{%pragmatic_cookies_site_settings}}');
         $this->dropTableIfExists('{{%pragmatic_cookies_cookies}}');
         $this->dropTableIfExists('{{%pragmatic_cookies_categories}}');
 
@@ -89,6 +90,20 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
+
+        $this->createTable('{{%pragmatic_cookies_site_settings}}', [
+            'id' => $this->primaryKey(),
+            'siteId' => $this->integer()->notNull(),
+            'popupTitle' => $this->string()->notNull(),
+            'popupDescription' => $this->text(),
+            'acceptAllLabel' => $this->string()->notNull(),
+            'rejectAllLabel' => $this->string()->notNull(),
+            'savePreferencesLabel' => $this->string()->notNull(),
+            'cookiePolicyUrl' => $this->string(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
     }
 
     private function createIndexes(): void
@@ -98,6 +113,7 @@ class Install extends Migration
         $this->createIndex(null, '{{%pragmatic_cookies_scan_results}}', 'scanId');
         $this->createIndex(null, '{{%pragmatic_cookies_scan_results}}', 'cookieId');
         $this->createIndex(null, '{{%pragmatic_cookies_consent_logs}}', 'visitorId');
+        $this->createIndex(null, '{{%pragmatic_cookies_site_settings}}', 'siteId', true);
     }
 
     private function addForeignKeys(): void
